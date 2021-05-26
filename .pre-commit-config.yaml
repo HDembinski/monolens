@@ -1,0 +1,51 @@
+# To use:
+#
+#     pre-commit run -a
+#
+# Or:
+#
+#     pre-commit install  # (runs every time you commit in git)
+#
+# To update this file:
+#
+#     pre-commit autoupdate
+#
+# See https://github.com/pre-commit/pre-commit
+
+repos:
+# Standard hooks
+- repo: https://github.com/pre-commit/pre-commit-hooks
+  rev: v4.0.0
+  hooks:
+  - id: check-case-conflict
+  - id: check-docstring-first
+  - id: check-executables-have-shebangs
+  - id: check-merge-conflict
+  - id: check-symlinks
+  - id: check-yaml
+  - id: debug-statements
+  - id: end-of-file-fixer
+  - id: mixed-line-ending
+  - id: sort-simple-yaml
+  - id: file-contents-sorter
+  - id: trailing-whitespace
+    exclude: ^doc/_static/.*.svg
+
+- repo: local
+  hooks:
+  - id: version-check
+    name: version-check
+    language: python
+    entry: python tests/test_version.py
+
+# Python linter (Flake8)
+- repo: https://gitlab.com/pycqa/flake8
+  rev: 3.9.2
+  hooks:
+  - id: flake8
+
+# Python formatting
+- repo: https://github.com/psf/black
+  rev: 21.5b1
+  hooks:
+  - id: black
