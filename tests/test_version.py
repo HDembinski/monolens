@@ -1,5 +1,5 @@
 from urllib.request import urlopen
-from urllib.error import HTTPError
+from urllib.error import HTTPError, URLError
 from pkg_resources import parse_version
 import json
 from pathlib import Path
@@ -17,6 +17,8 @@ def test_local_against_pypi_version():
     except HTTPError:
         # not yet on PyPI
         return
+    except URLError:
+        assert False
     assert r.code == 200
     payload = r.read()
     releases = json.loads(payload)["releases"]
