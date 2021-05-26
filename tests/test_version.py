@@ -7,7 +7,6 @@ from pathlib import Path
 
 def test_local_against_pypi_version():
     d = Path(__file__).parent / ".." / "monolense" / "__init__.py"
-    print(d)
     with open(d) as f:
         d = {}
         exec(f.read(), d)
