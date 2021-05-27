@@ -18,7 +18,7 @@ Install with `pip install monolens`. Then run `monolens` in a terminal on the sc
 
 # Known limitations
 
-- The app works smoothly on OSX, but flickers on Linux when you move the lens.
+- The app works smoothly on OSX, but may flicker on Linux when you move the lens.
 - Some people have found issues when using two screens. It is tested with two screens
   on OSX, but not yet on Linux. Please leave an issue if it does not work for you.
 - Pulling the window to another screen is currently not supported. To switch screens,
