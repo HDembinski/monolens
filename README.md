@@ -2,6 +2,8 @@
 
 Show part of your screen in 8-bit grayscale.
 
+![](demo.mov)
+
 # Usage
 
 Run `monolens` in a terminal on the screen that you want to look at.
