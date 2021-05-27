@@ -21,15 +21,15 @@ Install with `pip install monolens`. Then run `monolens` in a terminal on the sc
 - The app works smoothly on OSX, but may flicker on Linux when you move the lens.
 - Some people have found issues when using two screens. It is tested with two screens
   on OSX, but not yet on Linux. Please leave an issue if it does not work for you.
-- Pulling the window to another screen is currently not supported. To switch screens,
+- Pulling the lens to another screen is currently not supported. To switch screens,
   you need to run `monolens` from a terminal on that screen (this works on OSX at least).
   This limitation will hopefully be lifted in the near future.
 - The lens actually uses a static screenshot which is periodically updated. Because of
-  this pixels directly under the lens cannot be updated unless you move the lens away
-  first from new content that you want to look at and then back.
+  this, pixels directly under the lens cannot be updated unless you move the lens away
+  first from new content that you want to look at, and then back.
 - On OSX, you need to give `monolens` permission to make screenshots, since an ordinary
   app is not allowed to read pixels outside of its window for security reasons.
-  `monolens` is safe to use because it has no networking code implemented at all.
+  Doing this is safe; `monolens` has no networking code implemented at all.
 
 # For developers
 
