@@ -2,7 +2,7 @@
 
 Show part of your screen in 8-bit grayscale.
 
-![](demo.mov)
+![](https://user-images.githubusercontent.com/2631586/119804111-57356180-bee0-11eb-9177-9ad46544fbc2.mov)
 
 # Usage
 
