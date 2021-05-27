@@ -6,7 +6,7 @@ Show part of your screen in 8-bit grayscale.
 
 Watch the demo on YouTube.
 
-[<img src="https://user-images.githubusercontent.com/2631586/119907449-96030000-bf50-11eb-9f62-f5e1e708bdb5.png">](https://youtu.be/f8FRBlSoqWQ)
+[<img src="https://img.youtube.com/vi/f8FRBlSoqWQ/0.jpg">](https://youtu.be/f8FRBlSoqWQ)
 
 # Usage
 
