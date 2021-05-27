@@ -5,14 +5,21 @@ from .util import clip
 
 
 class Widget(QWidget):
+    _screen = None
+
     def __init__(self):
         QWidget.__init__(self)
-        self.setWindowFlag(Qt.FramelessWindowHint)
-        self.setWindowFlag(Qt.WindowStaysOnTopHint)
-        self.updateScreen()
+        for flag in (
+            Qt.FramelessWindowHint,
+            Qt.WindowStaysOnTopHint,
+        ):
+            self.setWindowFlag(flag)
+        self.setAttribute(Qt.WA_OpaquePaintEvent)
 
-    def refresh(self):
-        self.repaint(0, 0, self.width(), self.height())
+        self.updateScreen()
+        self._timer = QTimer(self)
+        self._timer.setInterval(200)
+        self._timer.timeout.connect(self.updateScreen)
 
     def updateScreen(self):
         screen = QGuiApplication.primaryScreen()
@@ -23,7 +30,26 @@ class Widget(QWidget):
             return
         image = screen.grabWindow(0).toImage()
         image = image.convertToFormat(QImage.Format_Grayscale8)
+        if self._screen is not None:
+            # use new screenshot for parts of screen not overlapping with window
+            p = QPainter(image)
+            margin = 50  # heuristic
+            x = max(0, self.x() - margin)
+            y = max(0, self.y() - margin)
+            w = min(self.width() + 2 * margin, image.width())
+            h = min(self.height() + 2 * margin, image.height())
+            p.drawImage(x, y, self._screen, x, y, w, h)
+            p.end()
         self._screen = image
+
+    def enterEvent(self, event):
+        self.updateScreen()
+        self._timer.start()
+        super(Widget, self).eventEvent(event)
+
+    def leaveEvent(self, event):
+        self._timer.stop()
+        super(Widget, self).leaveEvent(event)
 
     def paintEvent(self, event):
         screen = self.screen().geometry()
@@ -32,7 +58,6 @@ class Widget(QWidget):
         w = self.width()
         h = self.height()
         dpr = self.devicePixelRatio()
-
         p = QPainter(self)
         p.drawImage(0, 0, self._screen, x * dpr, y * dpr, w * dpr, h * dpr)
         p.setPen(QPen(Qt.white, 3))
@@ -41,20 +66,17 @@ class Widget(QWidget):
         super(Widget, self).paintEvent(event)
 
     def resizeEvent(self, event):
-        self.refresh()
+        self.update()
         super(Widget, self).resizeEvent(event)
 
     def moveEvent(self, event):
-        self.refresh()
+        self.update()
         super(Widget, self).moveEvent(event)
 
     def keyPressEvent(self, event):
         key = event.key()
         if key in (Qt.Key_Escape, Qt.Key_Q):
             self.close()
-        elif key == Qt.Key_Space:
-            self.hide()
-            QTimer.singleShot(0, self.show)
         elif key == Qt.Key_Left:
             x = self.x() + 25
             y = self.y()
@@ -90,18 +112,18 @@ class Widget(QWidget):
         super(Widget, self).keyPressEvent(event)
 
     def mousePressEvent(self, event):
-        self.startpos = event.position()
+        self._startpos = event.position()
         super(Widget, self).mousePressEvent(event)
 
     def mouseMoveEvent(self, event):
-        x = event.position().x() - self.startpos.x() + self.x()
-        y = event.position().y() - self.startpos.y() + self.y()
+        x = event.position().x() - self._startpos.x() + self.x()
+        y = event.position().y() - self._startpos.y() + self.y()
         self.move(*self._clipXY(x, y))
         super(Widget, self).mouseMoveEvent(event)
 
-    def showEvent(self, event):
-        self.updateScreen()
-        super(Widget, self).showEvent(event)
+    def mouseDoubleClickEvent(self, event):
+        self.close()
+        super(Widget, self).mouseDoubleClickEvent(event)
 
     def _clipXY(self, x, y):
         screen = self.screen().availableGeometry()

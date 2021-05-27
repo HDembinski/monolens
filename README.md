@@ -10,8 +10,7 @@ Install with `pip install monolens`. Then run `monolens` in a terminal on the sc
 
 - Drag the lens around by holding a Mouse button down inside the window
 - Resize the lens by pressing up, down, left, right
-- To refresh the lens press the spacebar (see limitations)
-- To quit, press Q
+- To quit, press Q or double click while hovering over the lens
 
 # Known limitations
 
@@ -21,8 +20,9 @@ Install with `pip install monolens`. Then run `monolens` in a terminal on the sc
 - Pulling the window to another screen is currently not supported. To switch screens,
   you need to run `monolens` from a terminal on that screen (this works on OSX at least).
   This limitation will hopefully be lifted in the near future.
-- The lens uses a static screenshot which has to be manually updated if the screen
-  content changed. Press spacebar to update the lens.
+- The lens actually uses a static screenshot which is periodically updated. Because of
+  this pixels directly under the lens cannot be updated unless you move the lens away
+  first from new content that you want to look at and then back.
 - On OSX, you need to give `monolens` permission to make screenshots, since an ordinary
   app is not allowed to read pixels outside of its window for security reasons.
   `monolens` is safe to use because it has no networking code implemented at all.
