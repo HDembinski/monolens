@@ -93,6 +93,16 @@ class Widget(QWidget):
         self.startpos = event.position()
         super(Widget, self).mousePressEvent(event)
 
+    def mouseMoveEvent(self, event):
+        x = event.position().x() - self.startpos.x() + self.x()
+        y = event.position().y() - self.startpos.y() + self.y()
+        self.move(*self._clipXY(x, y))
+        super(Widget, self).mouseMoveEvent(event)
+
+    def showEvent(self, event):
+        self.updateScreen()
+        super(Widget, self).showEvent(event)
+
     def _clipXY(self, x, y):
         screen = self.screen().availableGeometry()
         x = clip(x, screen.x(), screen.width() + screen.x() - self.width())
@@ -110,13 +120,3 @@ class Widget(QWidget):
         x2 = min(x2, screen.x() + screen.width())
         y2 = min(y2, screen.y() + screen.height())
         return x1, y1, x2 - x1, y2 - y1
-
-    def mouseMoveEvent(self, event):
-        x = event.position().x() - self.startpos.x() + self.x()
-        y = event.position().y() - self.startpos.y() + self.y()
-        self.move(*self._clipXY(x, y))
-        super(Widget, self).mouseMoveEvent(event)
-
-    def showEvent(self, event):
-        self.updateScreen()
-        super(Widget, self).showEvent(event)
