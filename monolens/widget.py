@@ -4,7 +4,7 @@ from PySide6.QtGui import QGuiApplication, QImage, QPainter, QPen
 from .util import clip
 
 
-class Main(QWidget):
+class Widget(QWidget):
     def __init__(self):
         QWidget.__init__(self)
         self.setWindowFlag(Qt.FramelessWindowHint)
@@ -38,15 +38,15 @@ class Main(QWidget):
         p.setPen(QPen(Qt.white, 3))
         p.drawRect(0, 0, w, h)
         p.end()
-        super(Main, self).paintEvent(event)
+        super(Widget, self).paintEvent(event)
 
     def resizeEvent(self, event):
         self.refresh()
-        super(Main, self).resizeEvent(event)
+        super(Widget, self).resizeEvent(event)
 
     def moveEvent(self, event):
         self.refresh()
-        super(Main, self).moveEvent(event)
+        super(Widget, self).moveEvent(event)
 
     def keyPressEvent(self, event):
         key = event.key()
@@ -87,11 +87,11 @@ class Main(QWidget):
             x, y, w, h = self._clipAll(x, y, w, h)
             self.move(x, y)
             self.resize(w, h)
-        super(Main, self).keyPressEvent(event)
+        super(Widget, self).keyPressEvent(event)
 
     def mousePressEvent(self, event):
         self.startpos = event.position()
-        super(Main, self).mousePressEvent(event)
+        super(Widget, self).mousePressEvent(event)
 
     def _clipXY(self, x, y):
         screen = self.screen().availableGeometry()
@@ -115,8 +115,8 @@ class Main(QWidget):
         x = event.position().x() - self.startpos.x() + self.x()
         y = event.position().y() - self.startpos.y() + self.y()
         self.move(*self._clipXY(x, y))
-        super(Main, self).mouseMoveEvent(event)
+        super(Widget, self).mouseMoveEvent(event)
 
     def showEvent(self, event):
         self.updateScreen()
-        super(Main, self).showEvent(event)
+        super(Widget, self).showEvent(event)
