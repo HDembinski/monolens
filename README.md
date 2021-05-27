@@ -14,7 +14,7 @@ Install with `pip install monolens`. Then run `monolens` in a terminal on the sc
 
 - Drag the lens around by holding a Mouse button down inside the window
 - Resize the lens by pressing up, down, left, right
-- To quit, press Q or double click while hovering over the lens
+- To quit, press Q or double click on the lens
 
 # Known limitations
 
