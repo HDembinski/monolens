@@ -1,5 +1,7 @@
 # monolens
 
+![](https://img.shields.io/pypi/v/monolens.svg)
+
 Show part of your screen in 8-bit grayscale.
 
 ![Click to watch demo](https://github.com/HDembinski/monolens/blob/main/demo.mov?raw=true)
