@@ -6,14 +6,14 @@ from pathlib import Path
 
 
 def test_local_against_pypi_version():
-    d = Path(__file__).parent / ".." / "monolense" / "__init__.py"
+    d = Path(__file__).parent / ".." / "monolens" / "__init__.py"
     with open(d) as f:
         d = {}
         exec(f.read(), d)
         local_version = parse_version(d["__version__"])
 
     try:
-        r = urlopen("https://pypi.org/pypi/monolense/json")
+        r = urlopen("https://pypi.org/pypi/monolens/json")
     except HTTPError:
         # not yet on PyPI
         return
