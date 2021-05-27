@@ -2,7 +2,7 @@
 
 Show part of your screen in 8-bit grayscale.
 
-![](demo.mov)
+![Click to watch demo](https://github.com/HDembinski/monolens/blob/main/demo.mov?raw=true)
 
 # Usage
 
