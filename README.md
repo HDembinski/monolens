@@ -9,6 +9,7 @@ Run `monolens` in a terminal on the screen that you want to look at.
 - Drag the lens around by holding a Mouse button down inside the window
 - Resize the lens by pressing up, down, left, right
 - To refresh the lens press the spacebar (see limitations)
+- To quit, press Q
 
 # Limitations
 
