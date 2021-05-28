@@ -21,6 +21,7 @@ jobs:
         python -m pip install --upgrade pip
         pip install wheel
 
+    - run: pip install -e .
     - run: python setup.py sdist bdist_wheel
 
     - uses: pypa/gh-action-pypi-publish@master
