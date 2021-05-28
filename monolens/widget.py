@@ -34,8 +34,9 @@ class Widget(QWidget):
             # use new screenshot for parts of screen not overlapping with window
             p = QPainter(image)
             margin = 50  # heuristic
-            x = max(0, self.x() - margin)
-            y = max(0, self.y() - margin)
+            geom  = self.geometry()
+            x = max(0, geom.x() - margin)
+            y = max(0, geom.y() - margin)
             w = min(self.width() + 2 * margin, image.width())
             h = min(self.height() + 2 * margin, image.height())
             p.drawImage(x, y, self._screen, x, y, w, h)
@@ -53,8 +54,9 @@ class Widget(QWidget):
 
     def paintEvent(self, event):
         screen = self.screen().geometry()
-        x = self.x() - screen.x()
-        y = max(0, self.y() - screen.y())
+        geom = self.geometry()
+        x = geom.x() - screen.x()
+        y = max(0, geom.y() - screen.y())
         w = self.width()
         h = self.height()
         dpr = self.devicePixelRatio()
