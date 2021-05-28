@@ -1,6 +1,6 @@
 from PySide6.QtWidgets import QWidget
-from PySide6.QtCore import Qt, QTimer
-from PySide6.QtGui import QGuiApplication, QImage, QPainter, QPen
+from PySide6.QtCore import Qt
+from PySide6.QtGui import QImage, QPainter, QPen
 from .util import clip
 
 
@@ -16,62 +16,50 @@ class Widget(QWidget):
             self.setWindowFlag(flag)
         self.setAttribute(Qt.WA_OpaquePaintEvent)
 
-        self.updateScreen()
-        self._timer = QTimer(self)
-        self._timer.setInterval(200)
-        self._timer.timeout.connect(self.updateScreen)
-
     def updateScreen(self):
-        screen = QGuiApplication.primaryScreen()
-        wh = self.windowHandle()
-        if wh:
-            screen = wh.screen()
+        screen = self.screen()
         if not screen:
             return
         image = screen.grabWindow(0).toImage()
         image = image.convertToFormat(QImage.Format_Grayscale8)
-        if self._screen is not None:
+        if self._screen:
             # use new screenshot for parts of screen not overlapping with window
             p = QPainter(image)
-            margin = 50  # heuristic
-            geom = self.geometry()
-            x = max(0, geom.x() - margin)
-            y = max(0, geom.y() - margin)
-            w = min(self.width() + 2 * margin, image.width())
-            h = min(self.height() + 2 * margin, image.height())
-            p.drawImage(x, y, self._screen, x, y, w, h)
+            margin = 100  # heuristic
+            wgeo = self.geometry()
+            sgeo = screen.geometry()
+            dpr = self.devicePixelRatio()
+            x = max(0, wgeo.x() - sgeo.x() - margin)
+            y = max(0, wgeo.y() - sgeo.y() - margin)
+            w = min(wgeo.width() + 2 * margin, sgeo.width())
+            h = min(wgeo.height() + 2 * margin, sgeo.height())
+            # why first two arguments must be x, y instead of x * dpr, y * dpr?
+            p.drawImage(x, y, self._screen, x * dpr, y * dpr, w * dpr, h * dpr)
             p.end()
         self._screen = image
 
-    def enterEvent(self, event):
-        self.updateScreen()
-        self._timer.start()
-        super(Widget, self).enterEvent(event)
-
-    def leaveEvent(self, event):
-        self._timer.stop()
-        super(Widget, self).leaveEvent(event)
-
     def paintEvent(self, event):
-        screen = self.screen().geometry()
-        geom = self.geometry()
-        x = geom.x() - screen.x()
-        y = max(0, geom.y() - screen.y())
-        w = self.width()
-        h = self.height()
+        sgeo = self.screen().geometry()
+        wgeo = self.geometry()
         dpr = self.devicePixelRatio()
+        x = wgeo.x() - sgeo.x()
+        y = max(0, wgeo.y() - sgeo.y())
+        w = wgeo.width()
+        h = wgeo.height()
         p = QPainter(self)
         p.drawImage(0, 0, self._screen, x * dpr, y * dpr, w * dpr, h * dpr)
         p.setPen(QPen(Qt.white, 3))
-        p.drawRect(0, 0, w, h)
+        p.drawRect(1, 1, w - 2, h - 2)
         p.end()
         super(Widget, self).paintEvent(event)
 
     def resizeEvent(self, event):
+        self.updateScreen()
         self.update()
         super(Widget, self).resizeEvent(event)
 
     def moveEvent(self, event):
+        self.updateScreen()
         self.update()
         super(Widget, self).moveEvent(event)
 
