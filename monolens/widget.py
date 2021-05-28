@@ -2,24 +2,32 @@ from PySide6.QtWidgets import QWidget
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QImage, QPainter, QPen, QGuiApplication
 from .util import clip
+import os
+
+DEBUG = int(os.environ.get("DEBUG", "0"))
 
 
 class Widget(QWidget):
     _screen = None
 
     def __init__(self):
-        QWidget.__init__(self)
+        super(Widget, self).__init__()
         for flag in (
             Qt.FramelessWindowHint,
             Qt.WindowStaysOnTopHint,
         ):
             self.setWindowFlag(flag)
         self.setAttribute(Qt.WA_OpaquePaintEvent)
+        self.setAttribute(Qt.WA_NoSystemBackground)
+        if DEBUG == 2:
+            self.updateScreen()
 
     def updateScreen(self):
         screen = self.screen()
         if not screen:
             return
+        if DEBUG:
+            print("updateScreen", screen.availableGeometry())
         image = screen.grabWindow(0).toImage()
         image = image.convertToFormat(QImage.Format_Grayscale8)
         if self._screen:
@@ -46,6 +54,8 @@ class Widget(QWidget):
         y = max(0, wgeo.y() - sgeo.y())
         w = wgeo.width()
         h = wgeo.height()
+        if DEBUG:
+            print("paint", x, y, w, h)
         p = QPainter(self)
         p.drawImage(0, 0, self._screen, x * dpr, y * dpr, w * dpr, h * dpr)
         p.setPen(QPen(Qt.white, 3))
@@ -54,12 +64,14 @@ class Widget(QWidget):
         super(Widget, self).paintEvent(event)
 
     def resizeEvent(self, event):
-        self.updateScreen()
+        if DEBUG < 2:
+            self.updateScreen()
         self.update()
         super(Widget, self).resizeEvent(event)
 
     def moveEvent(self, event):
-        self.updateScreen()
+        if DEBUG < 2:
+            self.updateScreen()
         self.update()
         super(Widget, self).moveEvent(event)
 
