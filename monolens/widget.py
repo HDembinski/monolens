@@ -1,6 +1,6 @@
 from PySide6.QtWidgets import QWidget
 from PySide6.QtCore import Qt
-from PySide6.QtGui import QImage, QPainter, QPen
+from PySide6.QtGui import QImage, QPainter, QPen, QGuiApplication
 from .util import clip
 
 
@@ -67,6 +67,8 @@ class Widget(QWidget):
         key = event.key()
         if key in (Qt.Key_Escape, Qt.Key_Q):
             self.close()
+        elif key == Qt.Key_S:
+            self._moveToNextScreen()
         elif key == Qt.Key_Left:
             x = self.x() + 25
             y = self.y()
@@ -132,3 +134,19 @@ class Widget(QWidget):
         x2 = min(x2, screen.x() + screen.width())
         y2 = min(y2, screen.y() + screen.height())
         return x1, y1, x2 - x1, y2 - y1
+
+    def _moveToNextScreen(self):
+        # discover on which screen we are
+        screens = QGuiApplication.screens()
+        for iscr, scr in enumerate(screens):
+            sgeo = scr.geometry()
+            if sgeo.contains(self.geometry()):
+                break
+        # move window to screen
+        nscr = len(screens)
+        iscr = (iscr + 1) % nscr
+        scr = screens[iscr]
+        ageo = scr.availableGeometry()
+        x = ageo.center().x() - self.width() // 2
+        y = ageo.center().y() - self.height() // 2
+        self.move(x, y)
