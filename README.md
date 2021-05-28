@@ -15,15 +15,16 @@ Install with `pip install monolens`. Then run `monolens` in a terminal on the sc
 - Drag the lens around by holding a Mouse button down inside the window
 - Resize the lens by pressing up, down, left, right
 - To quit, press Escape, Q, or double click on the lens
+- To move the lens to another screen, press S
 
 # Known limitations
 
-- The app works smoothly on OSX, but may flicker on Linux when you move the lens.
-- Some people have found issues when using two screens. It is tested with two screens
-  on OSX, but not yet on Linux. Please leave an issue if it does not work for you.
+- The app is tested on OSX and Linux. It may flicker when you move the lens, if you know
+  how to fix this, please help. :)
+- Some people have found issues when using two screens, which are hopefully fixed now.
+  Leave an issue if this problem appears.
 - Pulling the lens to another screen is currently not supported. To switch screens,
-  you need to run `monolens` from a terminal on that screen (this works on OSX at least).
-  This limitation will hopefully be lifted in the near future.
+  press S.
 - The lens actually uses a static screenshot which is periodically updated. Because of
   this, pixels directly under the lens cannot be updated unless you move the lens away
   first from new content that you want to look at, and then back.
@@ -35,6 +36,7 @@ Install with `pip install monolens`. Then run `monolens` in a terminal on the sc
 
 - Support gestures and move to rescale the lens (pinch etc)
 - Simulate color blindness
+- Add a splash screen with a "do not show again" to explain usage.
 
 # For developers
 
