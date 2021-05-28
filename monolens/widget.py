@@ -45,7 +45,7 @@ class Widget(QWidget):
     def enterEvent(self, event):
         self.updateScreen()
         self._timer.start()
-        super(Widget, self).eventEvent(event)
+        super(Widget, self).enterEvent(event)
 
     def leaveEvent(self, event):
         self._timer.stop()
