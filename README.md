@@ -31,6 +31,11 @@ Install with `pip install monolens`. Then run `monolens` in a terminal on the sc
   app is not allowed to read pixels outside of its window for security reasons.
   Doing this is safe; `monolens` has no networking code implemented at all.
 
+# Future plans
+
+- Support gestures and move to rescale the lens (pinch etc)
+- Simulate color blindness
+
 # For developers
 
 - You can run monolens without installing it from the project folder via
