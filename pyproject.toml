@@ -7,4 +7,4 @@ requires = [
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools_scm]
-write_to = "monolens/version.py"
+write_to = "monolens/_version.py"
