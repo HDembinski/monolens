@@ -8,7 +8,7 @@ DEBUG = int(os.environ.get("DEBUG", "0"))
 
 
 class Widget(QWidget):
-    _screen = None
+    _screenshot = None
 
     def __init__(self):
         super(Widget, self).__init__()
@@ -20,31 +20,7 @@ class Widget(QWidget):
         self.setAttribute(Qt.WA_OpaquePaintEvent)
         self.setAttribute(Qt.WA_NoSystemBackground)
         if DEBUG == 2:
-            self.updateScreen()
-
-    def updateScreen(self):
-        screen = self.screen()
-        if not screen:
-            return
-        if DEBUG:
-            print("updateScreen", screen.availableGeometry())
-        image = screen.grabWindow(0).toImage()
-        image = image.convertToFormat(QImage.Format_Grayscale8)
-        if self._screen:
-            # use new screenshot for parts of screen not overlapping with window
-            p = QPainter(image)
-            margin = 100  # heuristic
-            wgeo = self.geometry()
-            sgeo = screen.geometry()
-            dpr = self.devicePixelRatio()
-            x = max(0, wgeo.x() - sgeo.x() - margin)
-            y = max(0, wgeo.y() - sgeo.y() - margin)
-            w = min(wgeo.width() + 2 * margin, sgeo.width())
-            h = min(wgeo.height() + 2 * margin, sgeo.height())
-            # why first two arguments must be x, y instead of x * dpr, y * dpr?
-            p.drawImage(x, y, self._screen, x * dpr, y * dpr, w * dpr, h * dpr)
-            p.end()
-        self._screen = image
+            self._updateScreenshot(self.screen())
 
     def paintEvent(self, event):
         sgeo = self.screen().geometry()
@@ -57,7 +33,7 @@ class Widget(QWidget):
         if DEBUG:
             print("paint", x, y, w, h)
         p = QPainter(self)
-        p.drawImage(0, 0, self._screen, x * dpr, y * dpr, w * dpr, h * dpr)
+        p.drawImage(0, 0, self._screenshot, x * dpr, y * dpr, w * dpr, h * dpr)
         p.setPen(QPen(Qt.white, 3))
         p.drawRect(1, 1, w - 2, h - 2)
         p.end()
@@ -65,13 +41,13 @@ class Widget(QWidget):
 
     def resizeEvent(self, event):
         if DEBUG < 2:
-            self.updateScreen()
+            self._updateScreenshot(self.screen())
         self.repaint(0, 0, -1, -1)  # better than update() on OSX
         super(Widget, self).resizeEvent(event)
 
     def moveEvent(self, event):
         if DEBUG < 2:
-            self.updateScreen()
+            self._updateScreenshot(self.screen())
         self.repaint(0, 0, -1, -1)  # better than update() on OS
         super(Widget, self).moveEvent(event)
 
@@ -129,6 +105,29 @@ class Widget(QWidget):
         self.close()
         super(Widget, self).mouseDoubleClickEvent(event)
 
+    def _updateScreenshot(self, screen):
+        if not screen:
+            return
+        if DEBUG:
+            print("_updateScreenshot", screen.availableGeometry())
+        pix = screen.grabWindow(0).toImage()
+        screenshot = pix.convertToFormat(QImage.Format_Grayscale8)
+        if self._screenshot:
+            # override lens with old pixels from previous screenshot
+            p = QPainter(screenshot)
+            margin = 100  # heuristic
+            wgeo = self.geometry()
+            sgeo = screen.geometry()
+            dpr = self.devicePixelRatio()
+            x = max(0, wgeo.x() - sgeo.x() - margin)
+            y = max(0, wgeo.y() - sgeo.y() - margin)
+            w = min(wgeo.width() + 2 * margin, sgeo.width())
+            h = min(wgeo.height() + 2 * margin, sgeo.height())
+            # why first two arguments must be x, y instead of x * dpr, y * dpr?
+            p.drawImage(x, y, self._screenshot, x * dpr, y * dpr, w * dpr, h * dpr)
+            p.end()
+        self._screenshot = screenshot
+
     def _clipXY(self, x, y):
         screen = self.screen().availableGeometry()
         x = clip(x, screen.x(), screen.width() + screen.x() - self.width())
@@ -158,6 +157,8 @@ class Widget(QWidget):
         nscr = len(screens)
         iscr = (iscr + 1) % nscr
         scr = screens[iscr]
+        self._screenshot = None
+        self._updateScreenshot(scr)
         ageo = scr.availableGeometry()
         x = ageo.center().x() - self.width() // 2
         y = ageo.center().y() - self.height() // 2
