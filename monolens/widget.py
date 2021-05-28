@@ -66,13 +66,13 @@ class Widget(QWidget):
     def resizeEvent(self, event):
         if DEBUG < 2:
             self.updateScreen()
-        self.update()
+        self.repaint(0, 0, -1, -1)  # better than update() on OSX
         super(Widget, self).resizeEvent(event)
 
     def moveEvent(self, event):
         if DEBUG < 2:
             self.updateScreen()
-        self.update()
+        self.repaint(0, 0, -1, -1)  # better than update() on OS
         super(Widget, self).moveEvent(event)
 
     def keyPressEvent(self, event):
