@@ -34,7 +34,7 @@ class Widget(QWidget):
             # use new screenshot for parts of screen not overlapping with window
             p = QPainter(image)
             margin = 50  # heuristic
-            geom  = self.geometry()
+            geom = self.geometry()
             x = max(0, geom.x() - margin)
             y = max(0, geom.y() - margin)
             w = min(self.width() + 2 * margin, image.width())
