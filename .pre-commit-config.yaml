@@ -31,13 +31,6 @@ repos:
   - id: trailing-whitespace
     exclude: ^doc/_static/.*.svg
 
-- repo: local
-  hooks:
-  - id: version-check
-    name: version-check
-    language: python
-    entry: python tests/test_version.py
-
 # Python linter (Flake8)
 - repo: https://gitlab.com/pycqa/flake8
   rev: 3.9.2
