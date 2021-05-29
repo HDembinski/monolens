@@ -1,26 +1,23 @@
-from PySide6.QtWidgets import QWidget
-from PySide6.QtCore import Qt
-from PySide6.QtGui import QImage, QPainter, QPen, QGuiApplication
-from .util import clip
-import os
-
-DEBUG = int(os.environ.get("DEBUG", "0"))
+from PySide6 import QtWidgets, QtCore, QtGui
+from .util import clip, DEBUG
 
 
-class Widget(QWidget):
+class Lens(QtWidgets.QWidget):
     _screenshot = None
 
     def __init__(self):
-        super(Widget, self).__init__()
+        super().__init__()
         for flag in (
-            Qt.FramelessWindowHint,
-            Qt.WindowStaysOnTopHint,
+            QtCore.Qt.FramelessWindowHint,
+            QtCore.Qt.WindowStaysOnTopHint,
         ):
             self.setWindowFlag(flag)
-        self.setAttribute(Qt.WA_OpaquePaintEvent)
-        self.setAttribute(Qt.WA_NoSystemBackground)
-        if DEBUG == 2:
-            self._updateScreenshot(self.screen())
+        for flag in (
+            QtCore.Qt.WA_OpaquePaintEvent,
+            QtCore.Qt.WA_NoSystemBackground,
+        ):
+            self.setAttribute(flag)
+        self._updateScreenshot(self.screen())
 
     def paintEvent(self, event):
         sgeo = self.screen().geometry()
@@ -32,32 +29,32 @@ class Widget(QWidget):
         h = wgeo.height()
         if DEBUG:
             print("paint", x, y, w, h)
-        p = QPainter(self)
+        p = QtGui.QPainter(self)
         p.drawImage(0, 0, self._screenshot, x * dpr, y * dpr, w * dpr, h * dpr)
-        p.setPen(QPen(Qt.white, 3))
+        p.setPen(QtGui.QPen(QtCore.Qt.white, 3))
         p.drawRect(1, 1, w - 2, h - 2)
         p.end()
-        super(Widget, self).paintEvent(event)
+        super().paintEvent(event)
 
     def resizeEvent(self, event):
         if DEBUG < 2:
             self._updateScreenshot(self.screen())
         self.repaint(0, 0, -1, -1)  # better than update() on OSX
-        super(Widget, self).resizeEvent(event)
+        super().resizeEvent(event)
 
     def moveEvent(self, event):
         if DEBUG < 2:
             self._updateScreenshot(self.screen())
         self.repaint(0, 0, -1, -1)  # better than update() on OS
-        super(Widget, self).moveEvent(event)
+        super().moveEvent(event)
 
     def keyPressEvent(self, event):
         key = event.key()
-        if key in (Qt.Key_Escape, Qt.Key_Q):
+        if key in (QtCore.Qt.Key_Escape, QtCore.Qt.Key_Q):
             self.close()
-        elif key == Qt.Key_S:
+        elif key == QtCore.Qt.Key_S:
             self._moveToNextScreen()
-        elif key == Qt.Key_Left:
+        elif key == QtCore.Qt.Key_Left:
             x = self.x() + 25
             y = self.y()
             w = max(50, self.width() - 50)
@@ -65,7 +62,7 @@ class Widget(QWidget):
             x, y, w, h = self._clipAll(x, y, w, h)
             self.move(x, y)
             self.resize(w, h)
-        elif key == Qt.Key_Right:
+        elif key == QtCore.Qt.Key_Right:
             x = self.x() - 25
             y = self.y()
             w = self.width() + 50
@@ -73,7 +70,7 @@ class Widget(QWidget):
             x, y, w, h = self._clipAll(x, y, w, h)
             self.move(x, y)
             self.resize(w, h)
-        elif key == Qt.Key_Down:
+        elif key == QtCore.Qt.Key_Down:
             x = self.x()
             y = self.y() + 25
             w = self.width()
@@ -81,7 +78,7 @@ class Widget(QWidget):
             x, y, w, h = self._clipAll(x, y, w, h)
             self.move(x, y)
             self.resize(w, h)
-        elif key == Qt.Key_Up:
+        elif key == QtCore.Qt.Key_Up:
             x = self.x()
             y = self.y() - 25
             w = self.width()
@@ -89,21 +86,21 @@ class Widget(QWidget):
             x, y, w, h = self._clipAll(x, y, w, h)
             self.move(x, y)
             self.resize(w, h)
-        super(Widget, self).keyPressEvent(event)
+        super().keyPressEvent(event)
 
     def mousePressEvent(self, event):
         self._startpos = event.position()
-        super(Widget, self).mousePressEvent(event)
+        super().mousePressEvent(event)
 
     def mouseMoveEvent(self, event):
         x = event.position().x() - self._startpos.x() + self.x()
         y = event.position().y() - self._startpos.y() + self.y()
         self.move(*self._clipXY(x, y))
-        super(Widget, self).mouseMoveEvent(event)
+        super().mouseMoveEvent(event)
 
     def mouseDoubleClickEvent(self, event):
         self.close()
-        super(Widget, self).mouseDoubleClickEvent(event)
+        super().mouseDoubleClickEvent(event)
 
     def _updateScreenshot(self, screen):
         if not screen:
@@ -111,10 +108,10 @@ class Widget(QWidget):
         if DEBUG:
             print("_updateScreenshot", screen.availableGeometry())
         pix = screen.grabWindow(0).toImage()
-        screenshot = pix.convertToFormat(QImage.Format_Grayscale8)
+        screenshot = pix.convertToFormat(QtGui.QImage.Format_Grayscale8)
         if self._screenshot:
             # override lens with old pixels from previous screenshot
-            p = QPainter(screenshot)
+            p = QtGui.QPainter(screenshot)
             margin = 100  # heuristic
             wgeo = self.geometry()
             sgeo = screen.geometry()
@@ -148,7 +145,7 @@ class Widget(QWidget):
 
     def _moveToNextScreen(self):
         # discover on which screen we are
-        screens = QGuiApplication.screens()
+        screens = QtGui.QGuiApplication.screens()
         for iscr, scr in enumerate(screens):
             sgeo = scr.geometry()
             if sgeo.contains(self.geometry()):
