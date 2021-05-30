@@ -1,4 +1,4 @@
 *.egg-info
 __pycache__
-src/monolens/_version.py
+monolens/_version.py
 venv
