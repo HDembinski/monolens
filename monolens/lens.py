@@ -56,9 +56,9 @@ class Lens(QtWidgets.QWidget):
         key = event.key()
         if key in (QtCore.Qt.Key_Escape, QtCore.Qt.Key_Q):
             self.close()
-        elif key == QtCore.Qt.Key_S:
+        elif key == QtCore.Qt.Key_M:
             self._moveToNextScreen()
-        elif key == QtCore.Qt.Key_T:
+        elif key == QtCore.Qt.Key_Tab:
             self._conversion_type += 1
             if self._conversion_type == 4:
                 self._conversion_type = 0
@@ -186,6 +186,8 @@ class Lens(QtWidgets.QWidget):
     def _moveToNextScreen(self):
         # discover on which screen we are
         screens = QtGui.QGuiApplication.screens()
+        if len(screens) == 1:
+            return
         for iscr, scr in enumerate(screens):
             sgeo = scr.geometry()
             if sgeo.contains(self.geometry()):

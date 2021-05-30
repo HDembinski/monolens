@@ -57,7 +57,7 @@ def qimage_array_view(image):
     return np.asarray(QImageArrayInterface(image))
 
 
-@nb.njit(parallel=True)
+@nb.njit(parallel=True, cache=True)
 def _grayscale(d, s):
     a, r, g, b = argb
     for i in nb.prange(len(s)):
@@ -74,7 +74,7 @@ def grayscale(dest, source):
     _grayscale(d, s)
 
 
-@nb.njit(parallel=True)
+@nb.njit(parallel=True, cache=True)
 def _colorblindness(d, s, cb):
     a, r, g, b = argb
     for i in nb.prange(len(s)):

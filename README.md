@@ -18,8 +18,8 @@ command with or `pipx run monolens`.
 - Drag the lens around by holding a Mouse button down inside the window
 - To quit, press Escape, Q, or double click on the lens
 - Resize the lens by pressing up, down, left, right
-- Press T to switch through simulated monochromacy, deuteranopia, protanopia, tritanopia
-- To move the lens to another screen, press S
+- Press Tab to switch through simulated monochromacy, deuteranopia, protanopia, tritanopia
+- To move the lens to another screen, press M
 - On OSX, you need to give Monolens permission to make screenshots, which is safe.
 
 <!-- usage end -->
