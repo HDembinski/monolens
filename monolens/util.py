@@ -13,8 +13,11 @@ else:
 
 cb_lms = np.array(
     [
+        # Deuteropia (green weakness)
         [[1, 0, 0], [1.10104433, 0, -0.00901975], [0, 0, 1]],
+        # Protanopia (red weakness)
         [[0, 0.90822864, 0.008192], [0, 1, 0], [0, 0, 1]],
+        # Tritanopia (blue weakness)
         [[1, 0, 0], [0, 1, 0], [-0.15773032, 1.19465634, 0]],
     ],
 )

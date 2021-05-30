@@ -5,6 +5,7 @@ from . import util
 class Lens(QtWidgets.QWidget):
     _screenshot = None
     _converted = None
+    _conversion_type = 0
 
     def __init__(self):
         super().__init__()
@@ -19,6 +20,8 @@ class Lens(QtWidgets.QWidget):
         ):
             self.setAttribute(flag)
         self._updateScreenshot(self.screen())
+        settings = QtCore.QSettings()
+        self._conversion_type = int(settings.value("conversion_type", "0"))
 
     def paintEvent(self, event):
         sgeo = self.screen().geometry()
@@ -40,13 +43,13 @@ class Lens(QtWidgets.QWidget):
     def resizeEvent(self, event):
         if util.DEBUG < 2:
             self._updateScreenshot(self.screen())
-        self.repaint(0, 0, -1, -1)  # better than update() on OSX
+        self._refresh()
         super().resizeEvent(event)
 
     def moveEvent(self, event):
         if util.DEBUG < 2:
             self._updateScreenshot(self.screen())
-        self.repaint(0, 0, -1, -1)  # better than update() on OS
+        self._refresh()
         super().moveEvent(event)
 
     def keyPressEvent(self, event):
@@ -55,6 +58,13 @@ class Lens(QtWidgets.QWidget):
             self.close()
         elif key == QtCore.Qt.Key_S:
             self._moveToNextScreen()
+        elif key == QtCore.Qt.Key_T:
+            self._conversion_type += 1
+            if self._conversion_type == 4:
+                self._conversion_type = 0
+            QtCore.QSettings().setValue("conversion_type", self._conversion_type)
+            self._updateConverted()
+            self._refresh()
         elif key == QtCore.Qt.Key_Left:
             x = self.x() + 25
             y = self.y()
@@ -148,8 +158,12 @@ class Lens(QtWidgets.QWidget):
         self._updateConverted()
 
     def _updateConverted(self):
-        # util.grayscale(self._converted, self._screenshot)
-        util.colorblindness(self._converted, self._screenshot, 0)
+        if self._conversion_type == 0:
+            util.grayscale(self._converted, self._screenshot)
+        else:
+            util.colorblindness(
+                self._converted, self._screenshot, self._conversion_type - 1
+            )
 
     def _clipXY(self, x, y):
         screen = self.screen().availableGeometry()
@@ -186,3 +200,6 @@ class Lens(QtWidgets.QWidget):
         x = ageo.center().x() - self.width() // 2
         y = ageo.center().y() - self.height() // 2
         self.move(x, y)
+
+    def _refresh(self):
+        self.repaint(0, 0, -1, -1)  # better than update() on OSX
