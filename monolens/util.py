@@ -2,67 +2,14 @@ import os
 import sys
 from PySide6 import QtGui
 import numpy as np
-
-# import numba as nb
+import numba as nb
 
 DEBUG = int(os.environ.get("DEBUG", "0"))
 
-
-def clip(x, xmin, xmax):
-    if x < xmin:
-        return xmin
-    return min(x, xmax)
-
-
-class QImageArrayInterface:
-    __slots__ = ("__array_interface__",)
-
-    def __init__(self, image):
-        format = image.format()
-        assert format == QtGui.QImage.Format_RGB32
-        bytes_per_pixel = 4
-        bytes_per_line = image.bytesPerLine()
-        print(bytes_per_line)
-
-        self.__array_interface__ = {
-            "shape": (image.width() * image.height(),),
-            "typestr": "|u4",
-            "data": image.bits(),
-            "strides": (bytes_per_pixel,),
-            "version": 3,
-        }
-
-
-def qimage_array_view(image):
-    if sys.byteorder == "little":
-        bgra = (0, 1, 2, 3)
-    else:
-        bgra = (3, 2, 1, 0)
-
-    dtype = {
-        "b": (np.uint8, bgra[0], "blue"),
-        "g": (np.uint8, bgra[1], "green"),
-        "r": (np.uint8, bgra[2], "red"),
-        "a": (np.uint8, bgra[3], "alpha"),
-    }
-    raw = np.asarray(QImageArrayInterface(image))
-    return raw.view(dtype, np.recarray)
-
-
-# @nb.njit
-def _grayscale(d, s):
-    g = 0.299 * s.r + 0.587 * s.g + 0.114 * s.b
-    d.r = g
-    d.g = g
-    d.b = g
-
-
-def grayscale(dest, source):
-    s = qimage_array_view(source)
-    d = qimage_array_view(dest)
-    assert s.shape == d.shape
-    _grayscale(d, s)
-
+if sys.byteorder == "little":
+    argb = (3, 2, 1, 0)
+else:
+    argb = (0, 1, 2, 3)
 
 cb_lms = np.array(
     [
@@ -82,10 +29,59 @@ lms2rgb = np.linalg.inv(rgb2lms)
 cb_full = [np.linalg.multi_dot((lms2rgb, cbi, rgb2lms)) for cbi in cb_lms]
 
 
+def clip(x, xmin, xmax):
+    if x < xmin:
+        return xmin
+    return min(x, xmax)
+
+
+class QImageArrayInterface:
+    __slots__ = ("__array_interface__",)
+
+    def __init__(self, image):
+        format = image.format()
+        assert format == QtGui.QImage.Format_RGB32
+
+        self.__array_interface__ = {
+            "shape": (image.width() * image.height(), 4),
+            "typestr": "|u1",
+            "data": image.bits(),
+            "version": 3,
+        }
+
+
+def qimage_array_view(image):
+    return np.asarray(QImageArrayInterface(image))
+
+
+@nb.njit
+def _grayscale(d, s):
+    a, r, g, b = argb
+    for i, p in enumerate(s):
+        c = 0.299 * p[r] + 0.587 * p[g] + 0.114 * p[b]
+        d[i][r] = c
+        d[i][g] = c
+        d[i][b] = c
+
+
+def grayscale(dest, source):
+    s = qimage_array_view(source)
+    d = qimage_array_view(dest)
+    assert s.shape == d.shape
+    _grayscale(d, s)
+
+
+@nb.njit
+def _colorblindness(d, s, cb):
+    a, r, g, b = argb
+    for i, p in enumerate(s):
+        d[i, r] = cb[0, 0] * p[r] + cb[0, 1] * p[g] + cb[0, 2] * p[b]
+        d[i, g] = cb[1, 0] * p[r] + cb[1, 1] * p[g] + cb[1, 2] * p[b]
+        d[i, b] = cb[2, 0] * p[r] + cb[2, 1] * p[g] + cb[2, 2] * p[b]
+
+
 def colorblindness(dest, source, type):
     s = qimage_array_view(source)
     d = qimage_array_view(dest)
-    cbi = cb_full[type]
-    d.r = cbi[0, 0] * s.r + cbi[0, 1] * s.g + cbi[0, 2] * s.b
-    d.g = cbi[1, 0] * s.r + cbi[1, 1] * s.g + cbi[1, 2] * s.b
-    d.b = cbi[2, 0] * s.r + cbi[2, 1] * s.g + cbi[2, 2] * s.b
+    cb = cb_full[type]
+    _colorblindness(d, s, cb)

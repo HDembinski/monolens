@@ -149,8 +149,8 @@ class Lens(QtWidgets.QWidget):
         self._updateConverted()
 
     def _updateConverted(self):
-        util.grayscale(self._converted, self._screenshot)
-        # util.colorblindness(self._converted, self._screenshot, 0)
+        # util.grayscale(self._converted, self._screenshot)
+        util.colorblindness(self._converted, self._screenshot, 0)
 
     def _clipXY(self, x, y):
         screen = self.screen().availableGeometry()
