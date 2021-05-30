@@ -1,7 +1,5 @@
 from PySide6 import QtWidgets, QtCore, QtGui
-from .util import clip, DEBUG
-from PIL.ImageQt import ImageQt
-from PIL import Image
+from . import util
 
 
 class Lens(QtWidgets.QWidget):
@@ -31,7 +29,7 @@ class Lens(QtWidgets.QWidget):
         y = max(0, wgeo.y() - sgeo.y())
         w = wgeo.width()
         h = wgeo.height()
-        if DEBUG:
+        if util.DEBUG:
             print("paint", x, y, w, h)
         p = QtGui.QPainter(self)
         p.drawImage(0, 0, self._converted, x * dpr, y * dpr, w * dpr, h * dpr)
@@ -41,13 +39,13 @@ class Lens(QtWidgets.QWidget):
         super().paintEvent(event)
 
     def resizeEvent(self, event):
-        if DEBUG < 2:
+        if util.DEBUG < 2:
             self._updateScreenshot(self.screen())
         self.repaint(0, 0, -1, -1)  # better than update() on OSX
         super().resizeEvent(event)
 
     def moveEvent(self, event):
-        if DEBUG < 2:
+        if util.DEBUG < 2:
             self._updateScreenshot(self.screen())
         self.repaint(0, 0, -1, -1)  # better than update() on OS
         super().moveEvent(event)
@@ -109,7 +107,7 @@ class Lens(QtWidgets.QWidget):
     def _updateScreenshot(self, screen):
         if not screen:
             return
-        if DEBUG:
+        if util.DEBUG:
             print("_updateScreenshot", screen.availableGeometry())
         pix = screen.grabWindow(0)
         if (
@@ -117,11 +115,10 @@ class Lens(QtWidgets.QWidget):
             or self._screenshot.width() != pix.width()
             or self._screenshot.height() != pix.height()
         ):
-            self._image = Image.new("RGB", (pix.width(), pix.height()), color=None)
-            self._screenshot = ImageQt(self._image)
-            p = QtGui.QPainter(self._screenshot)
-            p.drawPixmap(0, 0, pix)
-            p.end()
+            self._screenshot = pix.toImage()
+            self._converted = QtGui.QImage(
+                pix.width(), pix.height(), QtGui.QImage.Format_RGB32
+            )
         else:
             # override lens with old pixels from previous screenshot
             p = QtGui.QPainter(self._screenshot)
@@ -134,7 +131,7 @@ class Lens(QtWidgets.QWidget):
             x2 = x1 + min(wgeo.width() + 2 * margin, sgeo.width())
             y2 = y1 + min(wgeo.height() + 2 * margin, sgeo.height())
             # why first two arguments must be x, y instead of x * dpr, y * dpr?
-            if DEBUG:
+            if util.DEBUG:
                 print("_updateScreenshot", x1, y1, x2, y2)
             # region left of window
             if x1 > 0:
@@ -152,13 +149,13 @@ class Lens(QtWidgets.QWidget):
         self._updateConverted()
 
     def _updateConverted(self):
-        self._converted = self._screenshot
-        self._image.fill(0)
+        util.grayscale(self._converted, self._screenshot)
+        # util.colorblindness(self._converted, self._screenshot, 0)
 
     def _clipXY(self, x, y):
         screen = self.screen().availableGeometry()
-        x = clip(x, screen.x(), screen.width() + screen.x() - self.width())
-        y = clip(y, screen.y(), screen.height() + screen.y() - self.height())
+        x = util.clip(x, screen.x(), screen.width() + screen.x() - self.width())
+        y = util.clip(y, screen.y(), screen.height() + screen.y() - self.height())
         return x, y
 
     def _clipAll(self, x, y, w, h):
