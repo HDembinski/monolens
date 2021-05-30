@@ -1,4 +1,4 @@
-from .version import version as __version__  # noqa
+from ._version import version as __version__  # noqa
 
 
 def main():

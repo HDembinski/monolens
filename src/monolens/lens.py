@@ -1,9 +1,13 @@
 from PySide6 import QtWidgets, QtCore, QtGui
 from .util import clip, DEBUG
+from PIL.ImageQt import ImageQt
+from PIL import Image
 
 
 class Lens(QtWidgets.QWidget):
+    _image = None
     _screenshot = None
+    _converted = None
 
     def __init__(self):
         super().__init__()
@@ -30,7 +34,7 @@ class Lens(QtWidgets.QWidget):
         if DEBUG:
             print("paint", x, y, w, h)
         p = QtGui.QPainter(self)
-        p.drawImage(0, 0, self._screenshot, x * dpr, y * dpr, w * dpr, h * dpr)
+        p.drawImage(0, 0, self._converted, x * dpr, y * dpr, w * dpr, h * dpr)
         p.setPen(QtGui.QPen(QtCore.Qt.white, 3))
         p.drawRect(1, 1, w - 2, h - 2)
         p.end()
@@ -107,23 +111,49 @@ class Lens(QtWidgets.QWidget):
             return
         if DEBUG:
             print("_updateScreenshot", screen.availableGeometry())
-        pix = screen.grabWindow(0).toImage()
-        screenshot = pix.convertToFormat(QtGui.QImage.Format_Grayscale8)
-        if self._screenshot:
-            # override lens with old pixels from previous screenshot
-            p = QtGui.QPainter(screenshot)
-            margin = 100  # heuristic
-            wgeo = self.geometry()
-            sgeo = screen.geometry()
-            dpr = self.devicePixelRatio()
-            x = max(0, wgeo.x() - sgeo.x() - margin)
-            y = max(0, wgeo.y() - sgeo.y() - margin)
-            w = min(wgeo.width() + 2 * margin, sgeo.width())
-            h = min(wgeo.height() + 2 * margin, sgeo.height())
-            # why first two arguments must be x, y instead of x * dpr, y * dpr?
-            p.drawImage(x, y, self._screenshot, x * dpr, y * dpr, w * dpr, h * dpr)
+        pix = screen.grabWindow(0)
+        if (
+            not self._screenshot
+            or self._screenshot.width() != pix.width()
+            or self._screenshot.height() != pix.height()
+        ):
+            self._image = Image.new("RGB", (pix.width(), pix.height()), color=None)
+            self._screenshot = ImageQt(self._image)
+            p = QtGui.QPainter(self._screenshot)
+            p.drawPixmap(0, 0, pix)
             p.end()
-        self._screenshot = screenshot
+        else:
+            # override lens with old pixels from previous screenshot
+            p = QtGui.QPainter(self._screenshot)
+            margin = 100  # heuristic
+            sgeo = screen.geometry()
+            wgeo = self.geometry()
+            dpr = self.devicePixelRatio()
+            x1 = max(0, wgeo.x() - sgeo.x() - margin)
+            y1 = max(0, wgeo.y() - sgeo.y() - margin)
+            x2 = x1 + min(wgeo.width() + 2 * margin, sgeo.width())
+            y2 = y1 + min(wgeo.height() + 2 * margin, sgeo.height())
+            # why first two arguments must be x, y instead of x * dpr, y * dpr?
+            if DEBUG:
+                print("_updateScreenshot", x1, y1, x2, y2)
+            # region left of window
+            if x1 > 0:
+                p.drawPixmap(0, 0, pix, 0, 0, x1 * dpr, -1)
+            # region right of window
+            if x2 < sgeo.width():
+                p.drawPixmap(x2, 0, pix, x2 * dpr, 0, -1, -1)
+            # region above window
+            if y1 > 0:
+                p.drawPixmap(x1, 0, pix, x1 * dpr, 0, (x2 - x1) * dpr, y1 * dpr)
+            # region below window
+            if y2 < sgeo.height():
+                p.drawPixmap(x1, y2, pix, x1 * dpr, y2 * dpr, (x2 - x1) * dpr, -1)
+            p.end()
+        self._updateConverted()
+
+    def _updateConverted(self):
+        self._converted = self._screenshot
+        self._image.fill(0)
 
     def _clipXY(self, x, y):
         screen = self.screen().availableGeometry()
