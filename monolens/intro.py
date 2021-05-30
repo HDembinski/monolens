@@ -14,7 +14,7 @@ class Intro(QtWidgets.QWidget):
         self.setWindowFlag(QtCore.Qt.WindowStaysOnTopHint)
         self.setWindowFlag(QtCore.Qt.WindowCloseButtonHint, False)
 
-        with open(Path(__file__).parent / ".." / ".." / "README.md") as f:
+        with open(Path(__file__).parent / ".." / "README.md") as f:
             m = re.search("<!-- usage begin -->\n(.+?)\n<!--", f.read(), re.DOTALL)
             usage = m.group(1).split("\n-")
         usage = "".join(f"<li>{x}</li>" for x in usage)
