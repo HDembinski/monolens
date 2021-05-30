@@ -54,27 +54,28 @@ def qimage_array_view(image):
     return np.asarray(QImageArrayInterface(image))
 
 
-@nb.njit
+@nb.njit(parallel=True)
 def _grayscale(d, s):
     a, r, g, b = argb
-    for i, p in enumerate(s):
+    for i in nb.prange(len(s)):
+        p = s[i]
         c = 0.299 * p[r] + 0.587 * p[g] + 0.114 * p[b]
-        d[i][r] = c
-        d[i][g] = c
-        d[i][b] = c
+        d[i, r] = c
+        d[i, g] = c
+        d[i, b] = c
 
 
 def grayscale(dest, source):
     s = qimage_array_view(source)
     d = qimage_array_view(dest)
-    assert s.shape == d.shape
     _grayscale(d, s)
 
 
-@nb.njit
+@nb.njit(parallel=True)
 def _colorblindness(d, s, cb):
     a, r, g, b = argb
-    for i, p in enumerate(s):
+    for i in nb.prange(len(s)):
+        p = s[i]
         d[i, r] = cb[0, 0] * p[r] + cb[0, 1] * p[g] + cb[0, 2] * p[b]
         d[i, g] = cb[1, 0] * p[r] + cb[1, 1] * p[g] + cb[1, 2] * p[b]
         d[i, b] = cb[2, 0] * p[r] + cb[2, 1] * p[g] + cb[2, 2] * p[b]

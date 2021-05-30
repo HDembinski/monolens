@@ -3,7 +3,6 @@ from . import util
 
 
 class Lens(QtWidgets.QWidget):
-    _image = None
     _screenshot = None
     _converted = None
 
