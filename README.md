@@ -41,8 +41,3 @@ Install with `pip install monolens` and then run `monolens` in a terminal or do 
 - Support gestures to rescale the lens (pinch etc)
 - Add filters that simulate color blindness as well
 - Add a splash screen with a "do not show again" to explain usage.
-
-# For developers
-
-- You can run Monolens without installing it from the project folder via
-  `python -m monolens`. You need to install `pyside6` manually then.
