@@ -11,12 +11,13 @@ if sys.byteorder == "little":
 else:
     argb = (0, 1, 2, 3)
 
+# matrix values from colorblind package
 cb_lms = np.array(
     [
-        # Deuteropia (green weakness)
-        [[1, 0, 0], [1.10104433, 0, -0.00901975], [0, 0, 1]],
         # Protanopia (red weakness)
         [[0, 0.90822864, 0.008192], [0, 1, 0], [0, 0, 1]],
+        # Deuteranopia (green weakness)
+        [[1, 0, 0], [1.10104433, 0, -0.00901975], [0, 0, 1]],
         # Tritanopia (blue weakness)
         [[1, 0, 0], [0, 1, 0], [-0.15773032, 1.19465634, 0]],
     ],
@@ -32,6 +33,7 @@ lms2rgb = np.linalg.inv(rgb2lms)
 cb_full = [np.linalg.multi_dot((lms2rgb, cbi, rgb2lms)) for cbi in cb_lms]
 
 
+@nb.njit(cache=True)
 def clip(x, xmin, xmax):
     if x < xmin:
         return xmin
@@ -58,11 +60,13 @@ def qimage_array_view(image):
 
 
 @nb.njit(parallel=True, cache=True)
-def _grayscale(d, s):
+def _grayscale(d, s, argb):
     a, r, g, b = argb
     for i in nb.prange(len(s)):
-        p = s[i]
-        c = 0.299 * p[r] + 0.587 * p[g] + 0.114 * p[b]
+        sr = s[i, r]
+        sg = s[i, g]
+        sb = s[i, b]
+        c = clip(0.299 * sr + 0.587 * sg + 0.114 * sb, 0, 255)
         d[i, r] = c
         d[i, g] = c
         d[i, b] = c
@@ -71,21 +75,26 @@ def _grayscale(d, s):
 def grayscale(dest, source):
     s = qimage_array_view(source)
     d = qimage_array_view(dest)
-    _grayscale(d, s)
+    _grayscale(d, s, argb)
 
 
 @nb.njit(parallel=True, cache=True)
-def _colorblindness(d, s, cb):
+def _colorblindness(d, s, cb, argb):
     a, r, g, b = argb
     for i in nb.prange(len(s)):
-        p = s[i]
-        d[i, r] = cb[0, 0] * p[r] + cb[0, 1] * p[g] + cb[0, 2] * p[b]
-        d[i, g] = cb[1, 0] * p[r] + cb[1, 1] * p[g] + cb[1, 2] * p[b]
-        d[i, b] = cb[2, 0] * p[r] + cb[2, 1] * p[g] + cb[2, 2] * p[b]
+        sr = s[i, r]
+        sg = s[i, g]
+        sb = s[i, b]
+        dr = cb[0, 0] * sr + cb[0, 1] * sg + cb[0, 2] * sb
+        dg = cb[1, 0] * sr + cb[1, 1] * sg + cb[1, 2] * sb
+        db = cb[2, 0] * sr + cb[2, 1] * sg + cb[2, 2] * sb
+        d[i, r] = clip(dr, 0, 255)
+        d[i, g] = clip(dg, 0, 255)
+        d[i, b] = clip(db, 0, 255)
 
 
 def colorblindness(dest, source, type):
     s = qimage_array_view(source)
     d = qimage_array_view(dest)
     cb = cb_full[type]
-    _colorblindness(d, s, cb)
+    _colorblindness(d, s, cb, argb)
