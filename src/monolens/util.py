@@ -2,6 +2,7 @@ import os
 import sys
 from PySide6 import QtGui
 import numpy as np
+import numba as nb
 
 DEBUG = int(os.environ.get("DEBUG", "0"))
 
@@ -13,23 +14,20 @@ def clip(x, xmin, xmax):
 
 
 class QImageArrayInterface:
-    __slots__ = (
-        "_image",
-        "__array_interface__",
-    )
+    __slots__ = ("__array_interface__",)
 
     def __init__(self, image):
-        self._image = image
         format = image.format()
         assert format == QtGui.QImage.Format_RGB32
         bytes_per_pixel = 4
         bytes_per_line = image.bytesPerLine()
+        print(bytes_per_line)
 
         self.__array_interface__ = {
-            "shape": (image.width(), image.height()),
+            "shape": (image.width() * image.height(),),
             "typestr": "|u4",
             "data": image.bits(),
-            "strides": (bytes_per_pixel, bytes_per_line),
+            "strides": (bytes_per_pixel,),
             "version": 3,
         }
 
@@ -40,25 +38,29 @@ def qimage_array_view(image):
     else:
         bgra = (3, 2, 1, 0)
 
-    dtype = dict(
-        b=(np.uint8, bgra[0], "blue"),
-        g=(np.uint8, bgra[1], "green"),
-        r=(np.uint8, bgra[2], "red"),
-        a=(np.uint8, bgra[3], "alpha"),
-    )
-
+    dtype = {
+        "b": (np.uint8, bgra[0], "blue"),
+        "g": (np.uint8, bgra[1], "green"),
+        "r": (np.uint8, bgra[2], "red"),
+        "a": (np.uint8, bgra[3], "alpha"),
+    }
     raw = np.asarray(QImageArrayInterface(image))
     return raw.view(dtype, np.recarray)
+
+
+@nb.njit
+def _grayscale(d, s):
+    g = 0.299 * s.r + 0.587 * s.g + 0.114 * s.b
+    d.r = g
+    d.g = g
+    d.b = g
 
 
 def grayscale(dest, source):
     s = qimage_array_view(source)
     d = qimage_array_view(dest)
     assert s.shape == d.shape
-    g = 0.299 * s.r + 0.587 * s.g + 0.114 * s.b
-    d.r = g
-    d.g = g
-    d.b = g
+    _grayscale(d, s)
 
 
 def to_lms(a):
@@ -80,16 +82,9 @@ def colorblindness(dest, source, type):
     d = qimage_array_view(dest)
     lms = to_lms(s)
     if type == 0:  # protanopia
-        sim_matrix = np.array(
-            [[0, 0.90822864, 0.008192], [0, 1, 0], [0, 0, 1]], dtype=np.float16
-        )
+        lms[0] = 0.90822864 * lms[1] + 0.008192 * lms[2]
     elif type == 1:  # deuteranopia
-        sim_matrix = np.array(
-            [[1, 0, 0], [1.10104433, 0, -0.00901975], [0, 0, 1]], dtype=np.float16
-        )
+        lms[1] = 1.10104433 * lms[0] - 0.00901975 * lms[2]
     elif type == 2:  # tritanopia
-        sim_matrix = np.array(
-            [[1, 0, 0], [0, 1, 0], [-0.15773032, 1.19465634, 0]], dtype=np.float16
-        )
-    img = np.einsum("ij,j...", sim_matrix, lms)
-    from_lms(d, img)
+        lms[2] = -0.15773032 * lms[0] + 1.19465634 * lms[1]
+    from_lms(d, lms)
