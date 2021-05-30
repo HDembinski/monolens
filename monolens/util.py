@@ -64,13 +64,12 @@ def grayscale(dest, source):
     _grayscale(d, s)
 
 
-cb = np.array(
+cb_lms = np.array(
     [
         [[1, 0, 0], [1.10104433, 0, -0.00901975], [0, 0, 1]],
         [[0, 0.90822864, 0.008192], [0, 1, 0], [0, 0, 1]],
         [[1, 0, 0], [0, 1, 0], [-0.15773032, 1.19465634, 0]],
     ],
-    dtype=np.float16,
 )
 rgb2lms = np.array(
     [
@@ -78,28 +77,15 @@ rgb2lms = np.array(
         [0.07092586, 0.96310739, 0.00135809],
         [0.02314268, 0.12801221, 0.93605194],
     ],
-    dtype=np.float16,
 )
 lms2rgb = np.linalg.inv(rgb2lms)
-
-cb_full = [np.linalg.multi_dot(lms2rgb, cbi, rgb2lms) for cbi in cb]
+cb_full = [np.linalg.multi_dot((lms2rgb, cbi, rgb2lms)) for cbi in cb_lms]
 
 
 def colorblindness(dest, source, type):
     s = qimage_array_view(source)
     d = qimage_array_view(dest)
-    d.r = (
-        cb_full[type][0, 0] * s.r
-        + cb_full[type][0, 1] * s.g
-        + cb_full[type][0, 2] * s.b
-    )
-    d.g = (
-        cb_full[type][1, 0] * s.r
-        + cb_full[type][1, 1] * s.g
-        + cb_full[type][1, 2] * s.b
-    )
-    d.b = (
-        cb_full[type][2, 0] * s.r
-        + cb_full[type][2, 1] * s.g
-        + cb_full[type][2, 2] * s.b
-    )
+    cbi = cb_full[type]
+    d.r = cbi[0, 0] * s.r + cbi[0, 1] * s.g + cbi[0, 2] * s.b
+    d.g = cbi[1, 0] * s.r + cbi[1, 1] * s.g + cbi[1, 2] * s.b
+    d.b = cbi[2, 0] * s.r + cbi[2, 1] * s.g + cbi[2, 2] * s.b
