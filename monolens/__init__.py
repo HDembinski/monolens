@@ -9,6 +9,11 @@ def main():
     import signal
     import re
 
+    if sys.version_info < (3, 9):
+        import importlib_resources
+    else:
+        import importlib.resources as importlib_resources
+
     QtCore.QCoreApplication.setOrganizationName("Monolens")
     QtCore.QCoreApplication.setApplicationName("Monolens")
 
@@ -20,7 +25,8 @@ def main():
     if "--reset" in app.arguments()[1:]:
         settings.clear()
 
-    with open("README.md") as f:
+    pkg = importlib_resources.files("monolens")
+    with open(pkg / "README.md") as f:
         tx = f.read()
         tag = "<!-- {0} begin -->\n(.+?)\n<!-- {0} end -->"
         m = re.search(tag.format("description"), tx, re.DOTALL)
