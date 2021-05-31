@@ -12,6 +12,11 @@ class Intro(QtWidgets.QWidget):
         self.setWindowFlag(QtCore.Qt.WindowStaysOnTopHint)
         self.setWindowFlag(QtCore.Qt.WindowCloseButtonHint, False)
 
+        sgeo = self.screen().availableGeometry()
+        w = sgeo.width()
+        h = sgeo.height()
+        self.setGeometry(0.6 * w, 0.25 * h, 0.35 * w, 0.5 * h)
+
         # TODO would be great to read this list from README
         tx = """<h1 align="center">Welcome to Monolens</h1>
         <p>Monolens allows you to view part of your screen in grayscale.</p>
@@ -20,13 +25,11 @@ class Intro(QtWidgets.QWidget):
             <li>Drag the lens around by holding a Mouse button down inside the window</li>
             <li>To quit, press Escape, Q, or double click on the lens</li>
             <li>Resize the lens by pressing up, down, left, right</li>
-            <li>Press Tab to switch between monochrome view and simulated protanopia,
-                deuteranopia, tritanopia</li>
+            <li>Press Tab to switch between monochrome view and simulated<br>
+                protanopia, deuteranopia, tritanopia</li>
             <li>To move the lens to another screen, press M</li>
         </ul>
-
         <br>
-
         <p>
             On OSX, you need to give Monolens permission to make screenshots, which is
             safe.
@@ -37,7 +40,7 @@ class Intro(QtWidgets.QWidget):
         font.setPointSize(16)
         text = QtWidgets.QLabel(tx)
         text.setFont(font)
-        button = QtWidgets.QPushButton("Start")
+        button = QtWidgets.QPushButton("Close")
         checkbox = QtWidgets.QCheckBox("Do not show this again")
 
         layout = QtWidgets.QVBoxLayout(self)
@@ -50,7 +53,3 @@ class Intro(QtWidgets.QWidget):
         checkbox.toggled.connect(
             lambda checked: QtCore.QSettings().setValue("show_intro", str(not checked))
         )
-
-    def closeEvent(self, event):
-        self.closed.emit()
-        super().closeEvent(event)

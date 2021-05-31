@@ -24,7 +24,5 @@ def main():
     if DEBUG == 2 or settings.value("show_intro", "True") == "True":
         intro = Intro()
         intro.show()
-        intro.closed.connect(lens.show)
-    else:
-        lens.show()
+    lens.show()
     sys.exit(app.exec())
