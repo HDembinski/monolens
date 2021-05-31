@@ -29,7 +29,6 @@ class Intro(QtWidgets.QWidget):
         self.setWindowFlag(QtCore.Qt.WindowStaysOnTopHint)
         self.setWindowFlag(QtCore.Qt.WindowCloseButtonHint, False)
 
-
         font = QtGui.QFont()
         font.setPointSize(16)
         text = QtWidgets.QLabel(usage)
