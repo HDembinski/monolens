@@ -1,7 +1,7 @@
 # monolens
 
 <!-- description begin -->
-View part of your screen in monochrome colors or in simulated protanopia, deuteranopia, or tritanopia.
+View part of your screen in greyscale or simulated colorblindness.
 <!-- description end -->
 
 [<img src="https://img.shields.io/pypi/v/monolens.svg">](https://pypi.org/project/monolens)
@@ -17,11 +17,11 @@ command with or `pipx run monolens`.
 
 <!-- usage begin -->
 - Drag the lens around by holding a Mouse button down inside the window
-- To quit, press Escape, Q, or double click on the lens
-- Resize the lens by pressing up, down, left, right
-- Press Tab to switch between monochrome view and simulated protanopia, deuteranopia, tritanopia
+- Press Escape, Q, or double click on the lens to quit
+- Press up, down, left, right to resize the lens
+- Press Tab to switch between greyscale and different forms of simulated colorblindness
 - Press I to switch view label on/off
-- To move the lens to another screen, press M
+- Press M to move the lens to another screen
 
 On OSX, you need to give Monolens permission to make screenshots, which is safe.
 <!-- usage end -->
