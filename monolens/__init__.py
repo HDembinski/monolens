@@ -38,11 +38,6 @@ On OSX, you need to give Monolens permission to make screenshots, which is safe.
 """
     )
 
-    defaults = {"conversion_type": "0"}
-    for key, val in defaults.items():
-        if not settings.contains(key):
-            settings.setValue(key, val)
-
     if DEBUG:
         print("settings:")
         for key in settings.allKeys():

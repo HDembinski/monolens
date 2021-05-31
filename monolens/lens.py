@@ -22,7 +22,7 @@ class Lens(QtWidgets.QWidget):
         self._updateScreenshot(self.screen())
 
         settings = QtCore.QSettings()
-        self._conversion_type = int(settings.value("conversion_type"))
+        self._conversion_type = int(settings.value("conversion_type"), "0")
 
         sgeo = self.screen().availableGeometry()
         w = sgeo.width()
