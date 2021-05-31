@@ -20,12 +20,14 @@ class Lens(QtWidgets.QWidget):
         ):
             self.setAttribute(flag)
         self._updateScreenshot(self.screen())
+
+        settings = QtCore.QSettings()
+        self._conversion_type = int(settings.value("conversion_type"))
+
         sgeo = self.screen().availableGeometry()
         w = sgeo.width()
         h = sgeo.height()
-        self.setGeometry(0.05 * w, 0.4 * h, 0.3 * w, 0.3 * h)
-        settings = QtCore.QSettings()
-        self._conversion_type = int(settings.value("conversion_type", "0"))
+        self.setGeometry(0.35 * w, 0.35 * h, 0.3 * w, 0.3 * h)
 
     def paintEvent(self, event):
         sgeo = self.screen().geometry()
