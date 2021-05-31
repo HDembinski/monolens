@@ -3,6 +3,21 @@ from pathlib import Path
 import re
 
 
+usage = """
+<h1 align="center">Welcome to Monolens</h1>
+<p>Monolens allows you to view part of your screen in grayscale.</p>
+<h2>Usage</h2>
+<ul>
+    <li> Drag the lens around by holding a Mouse button down inside the window
+    <li> To quit, press Escape, Q, or double click on the lens
+    <li> Resize the lens by pressing up, down, left, right
+    <li> Press Tab to switch between monochrome view and simulated protanopia, deuteranopia, tritanopia
+    <li> To move the lens to another screen, press M
+    <li> On OSX, you need to give Monolens permission to make screenshots, which is safe.
+</ul>
+"""
+
+
 class Intro(QtWidgets.QWidget):
 
     closed = QtCore.Signal()
@@ -14,24 +29,10 @@ class Intro(QtWidgets.QWidget):
         self.setWindowFlag(QtCore.Qt.WindowStaysOnTopHint)
         self.setWindowFlag(QtCore.Qt.WindowCloseButtonHint, False)
 
-        with open(Path(__file__).parent / ".." / "README.md") as f:
-            tx = f.read()
-            m = re.search("<!-- usage begin -->\n(.+?)\n<!--", tx, re.DOTALL)
-            usage = m.group(1).split("\n-")
-        usage = "".join(f"<li>{x}</li>" for x in usage if x and not x.isspace())
-
-        tx = f"""<h1 align="center">Welcome to Monolens</h1>
-        <p>Monolens allows you to view part of your screen in grayscale.</p>
-        <h2>Usage</h2>
-        <ul>
-        {usage}
-        </ul>
-        <br>
-        """
 
         font = QtGui.QFont()
         font.setPointSize(16)
-        text = QtWidgets.QLabel(tx)
+        text = QtWidgets.QLabel(usage)
         text.setFont(font)
         button = QtWidgets.QPushButton("Start")
         checkbox = QtWidgets.QCheckBox("Do not show this again")
