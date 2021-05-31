@@ -15,7 +15,7 @@
 repos:
 # Standard hooks
 - repo: https://github.com/pre-commit/pre-commit-hooks
-  rev: v4.0.0
+  rev: v4.0.1
   hooks:
   - id: check-case-conflict
   - id: check-docstring-first
@@ -32,13 +32,13 @@ repos:
     exclude: ^doc/_static/.*.svg
 
 # Python linter (Flake8)
-- repo: https://gitlab.com/pycqa/flake8
+- repo: https://github.com/PyCQA/flake8
   rev: 3.9.2
   hooks:
   - id: flake8
 
 # Python formatting
 - repo: https://github.com/psf/black
-  rev: 21.5b1
+  rev: 21.5b2
   hooks:
   - id: black
