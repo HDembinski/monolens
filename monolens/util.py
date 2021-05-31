@@ -67,6 +67,7 @@ def _grayscale(d, s, argb):
         sg = s[i, g]
         sb = s[i, b]
         c = clip(0.299 * sr + 0.587 * sg + 0.114 * sb, 0, 255)
+        d[i, a] = 255
         d[i, r] = c
         d[i, g] = c
         d[i, b] = c
@@ -88,6 +89,7 @@ def _colorblindness(d, s, cb, argb):
         dr = cb[0, 0] * sr + cb[0, 1] * sg + cb[0, 2] * sb
         dg = cb[1, 0] * sr + cb[1, 1] * sg + cb[1, 2] * sb
         db = cb[2, 0] * sr + cb[2, 1] * sg + cb[2, 2] * sb
+        d[i, a] = 255
         d[i, r] = clip(dr, 0, 255)
         d[i, g] = clip(dg, 0, 255)
         d[i, b] = clip(db, 0, 255)

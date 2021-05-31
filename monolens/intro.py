@@ -15,9 +15,10 @@ class Intro(QtWidgets.QWidget):
         self.setWindowFlag(QtCore.Qt.WindowCloseButtonHint, False)
 
         with open(Path(__file__).parent / ".." / "README.md") as f:
-            m = re.search("<!-- usage begin -->\n(.+?)\n<!--", f.read(), re.DOTALL)
+            tx = f.read()
+            m = re.search("<!-- usage begin -->\n(.+?)\n<!--", tx, re.DOTALL)
             usage = m.group(1).split("\n-")
-        usage = "".join(f"<li>{x}</li>" for x in usage)
+        usage = "".join(f"<li>{x}</li>" for x in usage if x and not x.isspace())
 
         tx = f"""<h1 align="center">Welcome to Monolens</h1>
         <p>Monolens allows you to view part of your screen in grayscale.</p>
