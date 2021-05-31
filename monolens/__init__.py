@@ -21,10 +21,9 @@ def main():
 
     # TODO would be great to read this from README.md
     print(
-        """Welcome to Monolens
-
-Monolens allows you to view part of your screen in grayscale.
-
+        "Monolens allows you to view part of your screen in monochrome or simulated "
+        "colorblindness.",
+        """
 Usage
 
 - Drag the lens around by holding a Mouse button down inside the window
@@ -32,10 +31,11 @@ Usage
 - Resize the lens by pressing up, down, left, right
 - Press Tab to switch between monochrome view and simulated
   protanopia, deuteranopia, tritanopia
+- Press I to switch view label on/off
 - To move the lens to another screen, press M
 
 On OSX, you need to give Monolens permission to make screenshots, which is safe.
-"""
+""",
     )
 
     if DEBUG:

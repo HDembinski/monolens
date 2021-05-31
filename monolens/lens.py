@@ -2,10 +2,23 @@ from PySide6 import QtWidgets, QtCore, QtGui
 from . import util
 
 
+LABELS = (
+    "monochrome",
+    "protanopia (red weekness)",
+    "deuteranopia (green weekness)",
+    "tritanopia (blue weekness)",
+)
+
+TEXT_PEN = QtGui.QPen()
+TEXT_PEN.setColor(QtGui.QColor(200, 200, 200))
+
+
 class Lens(QtWidgets.QWidget):
     _screenshot = None
     _converted = None
     _conversion_type = 0
+    _show_label = True
+    _settings = QtCore.QSettings()
 
     def __init__(self):
         super().__init__()
@@ -21,13 +34,13 @@ class Lens(QtWidgets.QWidget):
             self.setAttribute(flag)
         self._updateScreenshot(self.screen())
 
-        settings = QtCore.QSettings()
-        self._conversion_type = int(settings.value("conversion_type"), "0")
+        self._conversion_type = int(self._settings.value("conversion_type", "0"))
+        self._show_label = self._settings.value("show_label", "True") == "True"
 
         sgeo = self.screen().availableGeometry()
         w = sgeo.width()
         h = sgeo.height()
-        self.setGeometry(0.35 * w, 0.35 * h, 0.3 * w, 0.3 * h)
+        self.setGeometry(0.35 * w, 0.25 * h, 0.3 * w, 0.5 * h)
 
     def paintEvent(self, event):
         sgeo = self.screen().geometry()
@@ -43,6 +56,9 @@ class Lens(QtWidgets.QWidget):
         p.drawImage(0, 0, self._converted, x * dpr, y * dpr, w * dpr, h * dpr)
         p.setPen(QtGui.QPen(QtCore.Qt.white, 3))
         p.drawRect(1, 1, w - 2, h - 2)
+        if self._show_label:
+            p.setPen(TEXT_PEN)
+            p.drawText(7, wgeo.height() - 7, LABELS[self._conversion_type])
         p.end()
         super().paintEvent(event)
 
@@ -62,11 +78,15 @@ class Lens(QtWidgets.QWidget):
         key = event.key()
         if key in (QtCore.Qt.Key_Escape, QtCore.Qt.Key_Q):
             self.close()
+        elif key == QtCore.Qt.Key_I:
+            self._show_label = not self._show_label
+            self._settings.setValue("show_label", str(self._show_label))
+            self._refresh()
         elif key == QtCore.Qt.Key_M:
             self._moveToNextScreen()
         elif key == QtCore.Qt.Key_Tab:
             self._conversion_type += 1
-            if self._conversion_type == 4:
+            if self._conversion_type == len(LABELS):
                 self._conversion_type = 0
             QtCore.QSettings().setValue("conversion_type", self._conversion_type)
             self._updateConverted()
