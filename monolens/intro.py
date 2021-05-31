@@ -1,6 +1,4 @@
 from PySide6 import QtWidgets, QtCore, QtGui
-from pathlib import Path
-import re
 
 
 class Intro(QtWidgets.QWidget):
@@ -14,19 +12,25 @@ class Intro(QtWidgets.QWidget):
         self.setWindowFlag(QtCore.Qt.WindowStaysOnTopHint)
         self.setWindowFlag(QtCore.Qt.WindowCloseButtonHint, False)
 
-        with open(Path(__file__).parent / ".." / "README.md") as f:
-            tx = f.read()
-            m = re.search("<!-- usage begin -->\n(.+?)\n<!--", tx, re.DOTALL)
-            usage = m.group(1).split("\n-")
-        usage = "".join(f"<li>{x}</li>" for x in usage if x and not x.isspace())
-
-        tx = f"""<h1 align="center">Welcome to Monolens</h1>
+        # TODO would be great to read this list from README
+        tx = """<h1 align="center">Welcome to Monolens</h1>
         <p>Monolens allows you to view part of your screen in grayscale.</p>
         <h2>Usage</h2>
         <ul>
-        {usage}
+            <li>Drag the lens around by holding a Mouse button down inside the window</li>
+            <li>To quit, press Escape, Q, or double click on the lens</li>
+            <li>Resize the lens by pressing up, down, left, right</li>
+            <li>Press Tab to switch between monochrome view and simulated protanopia,
+                deuteranopia, tritanopia</li>
+            <li>To move the lens to another screen, press M</li>
         </ul>
+
         <br>
+
+        <p>
+            On OSX, you need to give Monolens permission to make screenshots, which is
+            safe.
+        </p>
         """
 
         font = QtGui.QFont()

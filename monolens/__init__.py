@@ -21,7 +21,7 @@ def main():
         for key in settings.allKeys():
             value = settings.value(key)
             print(f"  {key}: {value}")
-    if settings.value("show_intro", "True") == "True":
+    if DEBUG == 2 or settings.value("show_intro", "True") == "True":
         intro = Intro()
         intro.show()
         intro.closed.connect(lens.show)

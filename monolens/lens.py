@@ -126,8 +126,11 @@ class Lens(QtWidgets.QWidget):
         ):
             self._screenshot = pix.toImage()
             self._converted = QtGui.QImage(
-                pix.width(), pix.height(), QtGui.QImage.Format_RGB32
+                self._screenshot.width(),
+                self._screenshot.height(),
+                QtGui.QImage.Format_RGB32,
             )
+            self._converted.setDevicePixelRatio(self._screenshot.devicePixelRatio())
         else:
             # override lens with old pixels from previous screenshot
             p = QtGui.QPainter(self._screenshot)
