@@ -30,15 +30,15 @@ On OSX, you need to give Monolens permission to make screenshots, which is safe.
 
 - The app is tested on OSX and Linux. It may flicker when you move the lens (less so on
   OSX). If you know how to fix this, please help. :)
-- Pulling the lens to another screen is currently not supported. Press S to switch screens
-  instead.
+- Pulling the lens to another screen is currently not supported. See usage on how to
+  switch screens instead.
 - The lens actually uses a static screenshot which is updated as you move the lens around.
   This trick is necessary, because an app cannot read the pixels under its own window.
   Because of this, the pixels under the app are only updated when you move the lens away
-  first and then back.
+  first and then back. This is also the reason why the lens only works for static images.
 - On OSX, an ordinary app is not allowed to read pixels outside of its window for security
-  reasons, which is why this app needs special permissions. Doing this is safe; Monolens
-  contains no networking code and will neither store nor send your pixels anywhere.
+  reasons, which is why this app needs special permissions. Giving permissions is safe;
+  Monolens contains no networking code and will neither store nor send your pixels anywhere.
 
 # Future plans
 
