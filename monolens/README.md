@@ -1,7 +1,7 @@
 # monolens
 
 <!-- description begin -->
-View part of your screen in grayscale or filtered to simulate color vision deficiency. 
+View part of your screen in grayscale or filtered to simulate color vision deficiency.
 <!-- description end -->
 
 [<img src="https://img.shields.io/pypi/v/monolens.svg">](https://pypi.org/project/monolens)
