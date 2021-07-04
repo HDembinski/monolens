@@ -40,23 +40,12 @@ def clip(x, xmin, xmax):
     return min(x, xmax)
 
 
-class QImageArrayInterface:
-    __slots__ = ("__array_interface__",)
-
-    def __init__(self, image):
-        format = image.format()
-        assert format == QtGui.QImage.Format_RGB32
-
-        self.__array_interface__ = {
-            "shape": (image.width() * image.height(), 4),
-            "typestr": "|u1",
-            "data": image.bits(),
-            "version": 3,
-        }
-
-
 def qimage_array_view(image):
-    return np.asarray(QImageArrayInterface(image))
+    format = image.format()
+    assert format == QtGui.QImage.Format_RGB32
+    return np.frombuffer(image.bits(), dtype="|u1").reshape(
+        (image.width() * image.height(), 4)
+    )
 
 
 @nb.njit(parallel=True, cache=True)
