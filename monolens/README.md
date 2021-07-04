@@ -11,7 +11,7 @@ Watch the demo on YouTube.
 [<img src="https://img.youtube.com/vi/f8FRBlSoqWQ/0.jpg">](https://youtu.be/f8FRBlSoqWQ)
 
 Install with `pip install monolens` and then run `monolens` in a terminal or do it in one
-command with or `pipx run monolens`.
+command with `pipx run monolens`.
 
 Monolens was featured on Twitter by [Matthew Feickert](https://twitter.com/HEPfeickert/status/1399835341486493699) and [Matplotlib](https://twitter.com/matplotlib/status/1399842592674680836), and picked up in this episode of [Python Bytes](https://pythonbytes.fm/episodes/show/236/fuzzy-wuzzy-wazzy-fuzzy-was-faster). Thanks, guys!
 
