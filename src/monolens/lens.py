@@ -11,6 +11,7 @@ LABELS = (
 
 TEXT_PEN = QtGui.QPen()
 TEXT_PEN.setColor(QtGui.QColor(200, 200, 200))
+RGB32 = QtGui.QImage.Format_RGB32
 
 
 class Lens(QtWidgets.QWidget):
@@ -151,10 +152,12 @@ class Lens(QtWidgets.QWidget):
             or self._screenshot.height() != pix.height()
         ):
             self._screenshot = pix.toImage()
+            if True or self._screenshot.format() != RGB32:
+                self._screenshot.convertTo(RGB32)
             self._converted = QtGui.QImage(
                 self._screenshot.width(),
                 self._screenshot.height(),
-                QtGui.QImage.Format_RGB32,
+                RGB32,
             )
             self._converted.setDevicePixelRatio(self._screenshot.devicePixelRatio())
         else:
