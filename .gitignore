@@ -2,3 +2,4 @@
 __pycache__
 monolens/_version.py
 venv
+build

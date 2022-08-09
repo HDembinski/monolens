@@ -152,7 +152,7 @@ class Lens(QtWidgets.QWidget):
             or self._screenshot.height() != pix.height()
         ):
             self._screenshot = pix.toImage()
-            if self._screenshot.format() != RGB32:
+            if True or self._screenshot.format() != RGB32:
                 self._screenshot.convertTo(RGB32)
             self._converted = QtGui.QImage(
                 self._screenshot.width(),
