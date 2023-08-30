@@ -15,6 +15,8 @@ command with `pipx run monolens`.
 
 Monolens was featured on Twitter by [Matthew Feickert](https://twitter.com/HEPfeickert/status/1399835341486493699) and [Matplotlib](https://twitter.com/matplotlib/status/1399842592674680836), and picked up in this episode of [Python Bytes](https://pythonbytes.fm/episodes/show/236/fuzzy-wuzzy-wazzy-fuzzy-was-faster). Thanks, guys!
 
+Monolens uses the [Numba Just-In-Time compiler](https://numba.pydata.org/) to apply image filters in real-time using just ordinary Python.
+
 # Usage
 
 <!-- usage begin -->
@@ -34,10 +36,10 @@ On OSX, you need to give Monolens permission to make screenshots, which is safe.
   OSX). If you know how to fix this, please help. :)
 - Pulling the lens to another screen is currently not supported. See usage on how to
   switch screens instead.
-- The lens actually uses a static screenshot which is updated as you move the lens around.
-  This trick is necessary, because an app cannot read the pixels under its own window.
-  Because of this, the pixels under the app are only updated when you move the lens away
-  first and then back. This is also the reason why the lens only works for static images.
+- The lens only works for static images. The lens actually uses a static screenshot which
+  is updated as you move the lens around. This trick is necessary, because an app cannot
+  read the pixels under its own window. Because of this, the pixels under the app are only
+  updated when you move the lens away first and then back.
 - On OSX, an ordinary app is not allowed to read pixels outside of its window for security
   reasons, which is why this app needs special permissions. Giving permissions is safe;
   Monolens contains no networking code and will neither store nor send your pixels anywhere.
