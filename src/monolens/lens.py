@@ -1,7 +1,6 @@
 from PySide6 import QtWidgets, QtCore, QtGui
 from . import util
 
-
 LABELS = (
     "monochrome",
     "protanopia (red weekness)",
